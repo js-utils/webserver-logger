@@ -9,15 +9,14 @@ export default function (config) {
     SmXMLHttpRequestProxy.setProxy({
       // onreadystatechange 之前执行
       onreadystatechange_before: (xhr) => {
-        if (xhr.readyState == 2 && !new RegExp(config.server).test(xhr.responseURL)) {
-          console.log('post')
-          // axios.post(config.server, { message: `begin api: ${ xhr.responseURL }` })
+        if (xhr.readyState == 2 && !new RegExp(config.server).test(xhr.responseURL) && xhr.responseURL) {
+          axios.post(config.server, { message: `begin api: ${ xhr.responseURL }` }).catch(err => {})
         }
       },
       // onreadystatechange 之后执行
       onreadystatechange_after: (xhr) => {
-        if (xhr.readyState == 4 && !new RegExp(config.server).test(xhr.responseURL)) {
-          axios.post(config.server, { message: `after api: ${ xhr.responseURL }, responseData: ${ xhr.responseText }` })
+        if (xhr.readyState == 4 && !new RegExp(config.server).test(xhr.responseURL) && xhr.responseURL) {
+          axios.post(config.server, { message: `after api: ${ xhr.responseURL }, responseData: ${ xhr.responseText }` }).catch(err => {})
         }
       }
     })
@@ -28,7 +27,7 @@ export default function (config) {
     let originLog = console.log.bind(console)
     console.log = function () {
       originLog(...arguments)
-      axios.post(config.server, { message: JSON.stringify({ console: Array.prototype.join.call(arguments, ' ') }) })
+      axios.post(config.server, { message: JSON.stringify({ console: Array.prototype.join.call(arguments, ' ') }) }).catch(err => {})
     }
   }
 }
